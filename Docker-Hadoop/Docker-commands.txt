@@ -1,0 +1,34 @@
+--------------------------docker-basic-steps---------------------------------------------
+docker-compose up -d 
+docker exec -it namenode bash #where namenode is the containers name
+
+docker cp fares.csv namenode:/
+docker cp SparkHadoop-1.0-SNAPSHOT.jar namenode:/ 
+--------------------------installs--------------------------------------------------------
+apt-get update #must
+apt-get install wget tar bash
+
+wget https://www-eu.apache.org/dist/spark/spark-2.4.4/spark-2.4.4-bin-hadoop2.7.tgz #download to spark
+
+tar -xzf spark-2.4.4-bin-hadoop2.7.tgz && \
+    mv spark-2.4.4-bin-hadoop2.7 /spark && \
+    rm spark-2.4.4-bin-hadoop2.7.tgz     #extract install spark 
+---------------------move the necessary files \spark/bin---------------------------------------
+
+mv SparkHadoop-1.0-SNAPSHOT.jar /spark/bin
+
+-----------------load fares csv to hadoop hdfs----------------------------------------
+mkdir input
+mv fares.csv input
+
+hadoop fs -mkdir -p input
+
+hdfs dfs -put ./input/* /user/root/
+
+hdfs dfsadmin -safemode leave #optional sometimes
+----------------------RUN JAR-----------------------------------------------
+cd spark/bin
+./spark-submit --class testspark --master local[*] SparkHadoop-1.0-SNAPSHOT.jar
+
+docker-compose down
+
